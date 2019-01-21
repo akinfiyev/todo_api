@@ -1,0 +1,14 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: ToDo List API
+            description: API using Symfony framework
+            version: 1.0.1
+        securityDefinitions:
+            ApiToken:
+                type: apiKey
+                name: x-api-key
+                in: header
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
