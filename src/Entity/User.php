@@ -38,9 +38,12 @@ class User implements UserInterface, \JsonSerializable
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
-     * @Assert\NotNull()
      */
     private $password;
+
+    /**
+     * @Assert\NotNull()
+     */
     private $plainPassword;
 
     /**
