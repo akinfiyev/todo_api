@@ -1,4 +1,8 @@
 nelmio_api_doc:
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+
     documentation:
         info:
             title: ToDo List API
@@ -9,6 +13,63 @@ nelmio_api_doc:
                 type: apiKey
                 name: x-api-key
                 in: header
-    areas: # to filter documented areas
-        path_patterns:
-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+
+        paths:
+            /api/user/login:
+                post:
+                    tags:
+                        - User API
+                    description: Login into the api
+                    produces:
+                        - application/json
+                    parameters:
+                        - name: user
+                          description: User to login
+                          in: body
+                          required: true
+                          schema:
+                              type: object
+                              properties:
+                                  email:
+                                      type: string
+                                  plainPassword:
+                                      type: string
+                    responses:
+                        '200':
+                            description: Login successful
+                            schema:
+                                type: object
+                                properties:
+                                    token:
+                                        type: string
+                        '400':
+                            description: Bad request or credentials
+            /api/user/registration:
+                post:
+                    tags:
+                        - User API
+                    description: Registration new user
+                    produces:
+                        - application/json
+                    parameters:
+                        - name: user
+                          description: User to be registered
+                          in: body
+                          required: true
+                          schema:
+                              type: object
+                              properties:
+                                  email:
+                                      type: string
+                                  plainPassword:
+                                      type: string
+                    responses:
+                        '200':
+                            description: Registration successful
+                            schema:
+                                type: object
+                                properties:
+                                    api-token:
+                                        type: string
+                        '400':
+                            description: Bad request
