@@ -26,6 +26,7 @@ class User implements UserInterface, \JsonSerializable
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Assert\Email()
+     * @Assert\NotNull()
      */
     private $email;
 
@@ -37,6 +38,7 @@ class User implements UserInterface, \JsonSerializable
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\NotNull()
      */
     private $password;
     private $plainPassword;
