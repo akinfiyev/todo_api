@@ -26,7 +26,9 @@ class User implements UserInterface, \JsonSerializable
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Assert\Email()
-     * @Assert\NotNull()
+     * @Assert\NotNull(
+     *     message = "Email should not be blank"
+     * )
      */
     private $email;
 
@@ -42,7 +44,15 @@ class User implements UserInterface, \JsonSerializable
     private $password;
 
     /**
-     * @Assert\NotNull()
+     * @Assert\NotNull(
+     *     message = "Password should not be blank"
+     * )
+     * @Assert\Length(
+     *      min = 5,
+     *      max = 20,
+     *      minMessage = "Your password must be at least {{ limit }} characters long",
+     *      maxMessage = "Your password cannot be longer than {{ limit }} characters"
+     * )
      */
     private $plainPassword;
 

@@ -12,6 +12,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class JsonHttpException extends HttpException
 {
+    const AUTH_ERROR = 'Authentication error';
+
     /**
      * @var array
      */

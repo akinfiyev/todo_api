@@ -5,11 +5,12 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ItemListRepository")
  */
-class ItemList
+class ItemList implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -20,8 +21,17 @@ class ItemList
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(
+     *      min = 5,
+     *      max = 15,
+     *      minMessage = "ItemList name must be at least {{ limit }} characters long",
+     *      maxMessage = "ItemList name cannot be longer than {{ limit }} characters"
+     * )
+     * @Assert\NotNull(
+     *     message = "ItemList name should not be blank"
+     * )
      */
-    private $Name;
+    private $name;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="ItemLists")
@@ -35,7 +45,7 @@ class ItemList
     private $items;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Label", inversedBy="itemLists")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Label", inversedBy="itemLists", cascade={"persist"})
      */
     private $labels;
 
@@ -52,12 +62,12 @@ class ItemList
 
     public function getName(): ?string
     {
-        return $this->Name;
+        return $this->name;
     }
 
-    public function setName(string $Name): self
+    public function setName(string $name): self
     {
-        $this->Name = $Name;
+        $this->name = $name;
 
         return $this;
     }
@@ -129,5 +139,14 @@ class ItemList
         }
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            "id" => $this->getId(),
+            "name" => $this->getName(),
+            "labels" => $this->getLabels()
+        ];
     }
 }

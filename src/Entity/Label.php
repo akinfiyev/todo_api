@@ -5,11 +5,12 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LabelRepository")
  */
-class Label
+class Label implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -20,6 +21,15 @@ class Label
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(
+     *      min = 5,
+     *      max = 15,
+     *      minMessage = "Label title must be at least {{ limit }} characters long",
+     *      maxMessage = "Label title cannot be longer than {{ limit }} characters"
+     * )
+     * @Assert\NotNull(
+     *     message = "Label title should not be blank"
+     * )
      */
     private $title;
 
@@ -76,5 +86,12 @@ class Label
         }
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'title' => $this->getTitle()
+        ];
     }
 }

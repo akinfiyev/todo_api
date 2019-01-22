@@ -9,11 +9,10 @@ nelmio_api_doc:
             description: API using Symfony framework
             version: 1.0.1
         securityDefinitions:
-            ApiToken:
+            ApiAuth:
                 type: apiKey
                 name: x-api-key
                 in: header
-
         paths:
             /api/user/login:
                 post:
@@ -44,6 +43,7 @@ nelmio_api_doc:
                                         type: string
                         '400':
                             description: Bad request or credentials
+
             /api/user/registration:
                 post:
                     tags:
@@ -73,3 +73,49 @@ nelmio_api_doc:
                                         type: string
                         '400':
                             description: Bad request
+
+            /api/lists:
+                post:
+                    tags:
+                        - ItemList API
+                    description: Create new ItemList
+                    produces:
+                        - application/json
+                    parameters:
+                        - name: itemList
+                          description: ItemList to be created
+                          in: body
+                          required: true
+                          schema:
+                              type: object
+                              properties:
+                                  name:
+                                      type: string
+                                  labels:
+                                      type: array
+                                      items:
+                                          type: object
+                                          properties:
+                                              title:
+                                                  type: string
+                    responses:
+                        '200':
+                            description: List have been created successfully
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: integer
+                                    name:
+                                        type: string
+                                    labels:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                title:
+                                                    type: string
+                        '400':
+                            description: Bad request
+                    security:
+                        - ApiAuth: []

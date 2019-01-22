@@ -42,7 +42,7 @@ class UserController extends AbstractController
 
         $errors = $this->validator->validate($user);
         if (count($errors))
-            throw new JsonHttpException(400, (string) $errors->get(0)->getPropertyPath() . ': ' . (string) $errors->get(0)->getMessage());
+            throw new JsonHttpException(400, $errors->get(0)->getMessage());
 
         $this->getDoctrine()->getManager()->persist($user);
         $this->getDoctrine()->getManager()->flush();
@@ -61,7 +61,7 @@ class UserController extends AbstractController
 
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByEmail($user->getEmail());
         if (!$user)
-            throw new JsonHttpException(400, 'Authentication error');
+            throw new JsonHttpException(400, JsonHttpException::AUTH_ERROR);
 
         if($passwordEncoder->isPasswordValid($user,$plainPassword)){
             $user->setApiToken(Uuid::uuid4());
@@ -70,6 +70,6 @@ class UserController extends AbstractController
             return ($this->json($user));
         };
 
-        throw new JsonHttpException(400, 'Incorrect password');
+        throw new JsonHttpException(400, JsonHttpException::AUTH_ERROR);
     }
 }
