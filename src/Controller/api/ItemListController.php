@@ -4,14 +4,13 @@ namespace App\Controller\api;
 
 use App\Entity\ItemList;
 use App\Entity\User;
-use App\Exception\JsonHttpException;
-use App\Repository\UserRepository;
 use App\Security\ApiAuthenticator;
+use App\Services\ValidateService;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ItemListController extends AbstractController
 {
@@ -21,14 +20,14 @@ class ItemListController extends AbstractController
     private $serializer;
 
     /**
-     * @var ValidatorInterface
+     * @var ValidateService
      */
-    private $validator;
+    private $validateService;
 
-    public function __construct(SerializerInterface $serializer, ValidatorInterface $validator)
+    public function __construct(SerializerInterface $serializer, ValidateService $validateService)
     {
         $this->serializer = $serializer;
-        $this->validator = $validator;
+        $this->validateService = $validateService;
     }
 
     /**
@@ -36,21 +35,14 @@ class ItemListController extends AbstractController
      */
     public function listCreateAction(Request $request)
     {
-        $apiToken = $request->headers->get(ApiAuthenticator::X_API_KEY);
-
         /** @var User $user */
-        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($apiToken);
-        if (!$user)
-            throw new JsonHttpException(400, JsonHttpException::AUTH_ERROR);
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
 
         /* @var ItemList $itemList */
         $itemList = $this->serializer->deserialize($request->getContent(), ItemList::class, 'json');
         $itemList->setUser($user);
-
-        $errors = $this->validator->validate($itemList);
-        $errors->addAll($this->validator->validate($itemList->getLabels()));
-        if (count($errors))
-            throw new JsonHttpException(400, $errors->get(0)->getMessage());
+        $this->validateService->validate($itemList);
+        $this->validateService->validate($itemList->getLabels());
 
         $this->getDoctrine()->getManager()->persist($itemList);
         $this->getDoctrine()->getManager()->flush();
@@ -61,26 +53,14 @@ class ItemListController extends AbstractController
     /**
      * @Route("/api/lists", methods={"GET"}, name="api_lists_show")
      */
-    public function listsShowAction(Request $request)
+    public function listsShowAction(Request $request, PaginatorInterface $paginator)
     {
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        $page = $request->query->has('page') ? $request->query->get('page') : 1;
 
-        $query = $this->getDoctrine()
-            ->getRepository(Article::class)
-            ->createQueryBuilder('article')
-            ->where('article.isApproved = true')
-            ->andWhere('article.isDeleted = false')
-            ->orderBy('article.id', 'DESC')
-            ->getQuery();
-        $articles = $paginator->paginate(
-            $query,
-            $request->query->getInt('page', $page),
-            5
-        );
-
-        return $this->json($articles);
-
-        return ($this->json($request->headers->get('x-api-key')));
-
-        return ($this->json($request->headers->get('x-api-key')));
+        return $this->json($paginator->paginate(
+            $this->getDoctrine()->getRepository(ItemList::class)->findAllByUser($user),
+            $page,
+            5));
     }
 }

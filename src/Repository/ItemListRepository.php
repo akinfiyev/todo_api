@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\ItemList;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -19,32 +21,11 @@ class ItemListRepository extends ServiceEntityRepository
         parent::__construct($registry, ItemList::class);
     }
 
-    // /**
-    //  * @return ItemList[] Returns an array of ItemList objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findAllByUser(?User $user): ?Query
     {
-        return $this->createQueryBuilder('i')
-            ->andWhere('i.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('i.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->createQueryBuilder('itemList')
+            ->where('itemList.user = '. $user->getId())
+            ->orderBy('itemList.id', 'ASC')
+            ->getQuery();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?ItemList
-    {
-        return $this->createQueryBuilder('i')
-            ->andWhere('i.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

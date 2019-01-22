@@ -119,3 +119,38 @@ nelmio_api_doc:
                             description: Bad request
                     security:
                         - ApiAuth: []
+                get:
+                    tags:
+                        - ItemList API
+                    description: Get list of ItemLists
+                    produces:
+                        - application/json
+                    parameters:
+                        - name: page
+                          description: List page
+                          in: query
+                          required: false
+                          type: integer
+                    responses:
+                        '200':
+                            description: List of ItemLists
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: integer
+                                        name:
+                                            type: string
+                                        labels:
+                                            type: array
+                                            items:
+                                                type: object
+                                                properties:
+                                                    title:
+                                                        type: string
+                        '400':
+                            description: Bad request
+                    security:
+                        - ApiAuth: []

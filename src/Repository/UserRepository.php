@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Exception\JsonHttpException;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -19,13 +20,29 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    /**
+     * @param string|null $email
+     * @return User|null
+     */
     public function findOneByEmail(?string $email): ?User
     {
-        return $this->findOneBy(['email' => $email]);
+        $user = $this->findOneBy(['email' => $email]);
+        if (!$user)
+            throw new JsonHttpException(400, JsonHttpException::AUTH_ERROR);
+
+        return $user;
     }
 
+    /**
+     * @param string|null $apiToken
+     * @return User|null
+     */
     public function findOneByApiToken(?string $apiToken): ?User
     {
-        return $this->findOneBy(['apiToken' => $apiToken]);
+        $user = $this->findOneBy(['apiToken' => $apiToken]);
+        if (!$user)
+            throw new JsonHttpException(400, JsonHttpException::AUTH_ERROR);
+
+        return $user;
     }
 }
