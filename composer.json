@@ -6,6 +6,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "doctrine/annotations": "^1.6",
+        "knplabs/knp-paginator-bundle": "^2.8",
         "nelmio/api-doc-bundle": "^3.3",
         "ramsey/uuid": "^3.8",
         "symfony/asset": "4.2.*",
@@ -16,6 +17,7 @@
         "symfony/orm-pack": "^1.0",
         "symfony/security-bundle": "4.2.*",
         "symfony/serializer": "4.2.*",
+        "symfony/translation": "4.2.*",
         "symfony/twig-bundle": "4.2.*",
         "symfony/validator": "4.2.*",
         "symfony/yaml": "4.2.*"
