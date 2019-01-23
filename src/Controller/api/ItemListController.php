@@ -2,8 +2,10 @@
 
 namespace App\Controller\api;
 
+use App\Entity\Item;
 use App\Entity\ItemList;
 use App\Entity\User;
+use App\Normalizer\ItemListNormalizer;
 use App\Security\ApiAuthenticator;
 use App\Services\ValidateService;
 use Knp\Component\Pager\PaginatorInterface;
@@ -56,11 +58,50 @@ class ItemListController extends AbstractController
     public function listsShowAction(Request $request, PaginatorInterface $paginator)
     {
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
-        $page = $request->query->has('page') ? $request->query->get('page') : 1;
+        $startId = $request->query->has('startId') ? $request->query->get('startId') : 0;
 
-        return $this->json($paginator->paginate(
-            $this->getDoctrine()->getRepository(ItemList::class)->findAllByUser($user),
-            $page,
-            5));
+        if ($request->query->has('labelId')) {
+            return $this->json($paginator->paginate(
+                $this->getDoctrine()->getRepository(ItemList::class)->findAllByLabel($request->query->get('labelId'), $user, $startId),
+                1,
+                5));
+        } else {
+            /* @var ItemList $itemList */
+            return $this->json($paginator->paginate(
+                $this->getDoctrine()->getRepository(ItemList::class)->findAllByUser($user, $startId),
+                1,
+                5));
+        }
+    }
+
+    /**
+     * @Route("/api/list/{id}", methods={"POST"}, name="api_list_task_add")
+     */
+    public function listTaskAddAction(Request $request, ItemList $itemList, ItemListNormalizer $itemListNormalizer)
+    {
+        /* @var Item $item */
+        $item = $this->serializer->deserialize($request->getContent(), Item::class, 'json');
+        $this->validateService->validate($item);
+
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        /* @var ItemList $itemList */
+        $itemList = $this->getDoctrine()->getRepository(ItemList::class)->findOneById($itemList->getId(), $user);
+        $itemList->addItem($item);
+
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->json($itemListNormalizer->normalize($itemList, ItemListNormalizer::FORMAT_DETAILED));
+    }
+
+    /**
+     * @Route("/api/list/{id}", methods={"GET"}, name="api_list_show")
+     */
+    public function listShowAction(Request $request, ItemList $itemList, ItemListNormalizer $itemListNormalizer)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        /* @var ItemList $itemList */
+        $itemList = $this->getDoctrine()->getRepository(ItemList::class)->findOneById($itemList->getId(), $user);
+
+        return $this->json($itemListNormalizer->normalize($itemList, ItemListNormalizer::FORMAT_DETAILED));
     }
 }

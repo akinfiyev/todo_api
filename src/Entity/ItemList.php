@@ -40,7 +40,7 @@ class ItemList implements \JsonSerializable
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Item", mappedBy="list")
+     * @ORM\OneToMany(targetEntity="App\Entity\Item", mappedBy="list", cascade={"persist"})
      */
     private $items;
 

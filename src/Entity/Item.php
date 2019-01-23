@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ItemRepository")
+ * @ORM\EntityListeners({"App\EntityListener\ItemListener"})
  */
-class Item
+class Item implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -18,6 +20,15 @@ class Item
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(
+     *      min = 5,
+     *      max = 15,
+     *      minMessage = "Item name must be at least {{ limit }} characters long",
+     *      maxMessage = "Item name cannot be longer than {{ limit }} characters"
+     * )
+     * @Assert\NotNull(
+     *     message = "Item name should not be blank"
+     * )
      */
     private $title;
 
@@ -105,5 +116,16 @@ class Item
         $this->attachment = $attachment;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            "id" => $this->getId(),
+            "title" => $this->getTitle(),
+            "expiration" => $this->getExpiration(),
+            "isChecked" => $this->getIsChecked(),
+            "attachment" => $this->getAttachment()
+        ];
     }
 }
