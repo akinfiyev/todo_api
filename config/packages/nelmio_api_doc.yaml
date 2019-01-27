@@ -7,3 +7,90 @@ nelmio_api_doc:
             title: ToDo api
             description: API using Symfony framework
             version: 1.0.1
+        paths:
+            /api/users:
+                post:
+                    tags:
+                        - User API
+                    description: Registration new user
+                    produces:
+                        - application/json
+                    parameters:
+                        - name: user
+                          description: User to be registered
+                          in: body
+                          required: true
+                          schema:
+                              type: object
+                              properties:
+                                  email:
+                                      type: string
+                                  plainPassword:
+                                      type: string
+                    responses:
+                        '200':
+                            description: Registration successful
+                            schema:
+                                type: object
+                                properties:
+                                    api-token:
+                                        type: string
+                        '400':
+                            description: Bad request
+#                get:
+#                    tags:
+#                        - User API
+#                        description: Registration new user
+#                        produces:
+#                            - application/json
+#                        parameters:
+#                            - name: user
+#                              description: User to be registered
+#                              in: body
+#                              required: true
+#                              schema:
+#                                  type: object
+#                                  properties:
+#                                      email:
+#                                          type: string
+#                                      plainPassword:
+#                                          type: string
+#                        responses:
+#                            '200':
+#                                description: Registration successful
+#                                schema:
+#                                    type: object
+#                                    properties:
+#                                        api-token:
+#                                            type: string
+#                            '400':
+#                                description: Bad request
+#            /api/users/login:
+#                post:
+#                    tags:
+#                        - User API
+#                    description: Login into the api
+#                    produces:
+#                        - application/json
+#                    parameters:
+#                        - name: user
+#                          description: User to login
+#                          in: body
+#                          required: true
+#                          schema:
+#                              type: object
+#                              properties:
+#                                  email:
+#                                      type: string
+#                                  plainPassword:
+#                                      type: string
+#                    responses:
+#                        '200':
+#                            description: Login successful
+#                            schema:
+#                                type: object
+#                                properties:
+#                                    token:
+#                                        type: string
+#                        '400':
+#                            description: Bad request or credentials
