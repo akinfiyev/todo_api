@@ -16,6 +16,10 @@ security:
             security: false
         main:
             anonymous: true
+            logout: ~
+            guard:
+                authenticators:
+                    - App\Security\ApiAuthenticator
 
             # activate different ways to authenticate
 
