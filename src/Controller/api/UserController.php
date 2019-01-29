@@ -3,11 +3,13 @@
 namespace App\Controller\api;
 
 use App\Entity\User;
+use App\Exception\JsonHttpException;
 use App\Services\ValidateService;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class UserController extends AbstractController
@@ -43,18 +45,20 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/users", methods={"GET"}, name="api_users_list")
-     */
-    public function listAction()
-    {
-        return null;
-    }
-
-    /**
      * @Route("/api/users/login", methods={"POST"}, name="api_users_login")
      */
-    public function loginAction()
+    public function loginAction(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
-        return null;
+        /* @var User $user */
+        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
+        $plainPassword = $user->getPlainPassword();
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByEmail($user->getEmail());
+        if (!$passwordEncoder->isPasswordValid($user, $plainPassword))
+            throw new JsonHttpException(400, JsonHttpException::AUTH_ERROR);
+
+        $user->setApiToken(Uuid::uuid4());
+        $this->getDoctrine()->getManager()->flush();
+
+        return ($this->json($user));
     }
 }

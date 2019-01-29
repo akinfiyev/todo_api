@@ -7,6 +7,12 @@ nelmio_api_doc:
             title: ToDo api
             description: API using Symfony framework
             version: 1.0.1
+        securityDefinitions:
+            ApiAuth:
+                type: apiKey
+                name: x-api-key
+                in: header
+
         paths:
             /api/users:
                 post:
@@ -33,64 +39,57 @@ nelmio_api_doc:
                             schema:
                                 type: object
                                 properties:
-                                    api-token:
+                                    apiToken:
                                         type: string
                         '400':
                             description: Bad request
-#                get:
-#                    tags:
-#                        - User API
-#                        description: Registration new user
-#                        produces:
-#                            - application/json
-#                        parameters:
-#                            - name: user
-#                              description: User to be registered
-#                              in: body
-#                              required: true
-#                              schema:
-#                                  type: object
-#                                  properties:
-#                                      email:
-#                                          type: string
-#                                      plainPassword:
-#                                          type: string
-#                        responses:
-#                            '200':
-#                                description: Registration successful
-#                                schema:
-#                                    type: object
-#                                    properties:
-#                                        api-token:
-#                                            type: string
-#                            '400':
-#                                description: Bad request
-#            /api/users/login:
+            /api/users/login:
+                post:
+                    tags:
+                        - User API
+                    description: User login
+                    produces:
+                        - application/json
+                    parameters:
+                        - name: credentials
+                          description: Credentials to login
+                          in: body
+                          required: true
+                          schema:
+                              type: object
+                              properties:
+                                  email:
+                                      type: string
+                                  plainPassword:
+                                      type: string
+                    responses:
+                        '200':
+                            description: Login successful
+                            schema:
+                                type: object
+                                properties:
+                                    apiToken:
+                                        type: string
+                        '400':
+                            description: Bad request or credentials
+#            /api/lists:
 #                post:
-#                    tags:
-#                        - User API
-#                    description: Login into the api
-#                    produces:
-#                        - application/json
 #                    parameters:
-#                        - name: user
-#                          description: User to login
+#                        - name: itemList
+#                          description: ItemList to be created
 #                          in: body
 #                          required: true
 #                          schema:
 #                              type: object
 #                              properties:
-#                                  email:
+#                                  name:
 #                                      type: string
-#                                  plainPassword:
-#                                      type: string
-#                    responses:
-#                        '200':
-#                            description: Login successful
-#                            schema:
-#                                type: object
-#                                properties:
-#                                    token:
-#                                        type: string
-#                        '400':
-#                            description: Bad request or credentials
+#                                  labels:
+#                                      type: array
+#                                      items:
+#                                          type: object
+#                                          properties:
+#                                              title:
+#                                                  type: string
+#                    security:
+#                        - ApiAuth: []
