@@ -1,7 +1,7 @@
 nelmio_api_doc:
-    areas: # to filter documented areas
+    areas:
         path_patterns:
-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+            - ^/api(?!/doc$)
     documentation:
         info:
             title: ToDo api
@@ -72,18 +72,20 @@ nelmio_api_doc:
                                         type: string
                         '400':
                             description: Bad request or credentials
-#            /api/lists:
-#                post:
-#                    parameters:
-#                        - name: itemList
-#                          description: ItemList to be created
-#                          in: body
-#                          required: true
-#                          schema:
-#                              type: object
-#                              properties:
-#                                  name:
-#                                      type: string
+            /api/lists:
+                post:
+                    tags:
+                        - ItemList API
+                    parameters:
+                        - name: ItemList
+                          description: ItemList to be created
+                          in: body
+                          required: true
+                          schema:
+                              type: object
+                              properties:
+                                  title:
+                                      type: string
 #                                  labels:
 #                                      type: array
 #                                      items:
@@ -91,5 +93,85 @@ nelmio_api_doc:
 #                                          properties:
 #                                              title:
 #                                                  type: string
-#                    security:
-#                        - ApiAuth: []
+                    responses:
+                        '200':
+                            description: List have been successfully created
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: integer
+                                    title:
+                                        type: string
+                        '400':
+                            description: Bad request
+                    security:
+                        - ApiAuth: []
+                get:
+                    tags:
+                        - ItemList API
+                    parameters:
+                        - name: startId
+                          description: First list to be showed
+                          in: query
+                          required: false
+                          type: integer
+                        - name: listsNumber
+                          description: Number of lists to be showed
+                          in: query
+                          required: false
+                          type: integer
+                    responses:
+                        '200':
+                            description: User's lists
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: integer
+                                        title:
+                                            type: string
+                        '400':
+                            description: Bad request
+                    security:
+                        - ApiAuth: []
+            /api/lists/{id}:
+                delete:
+                    tags:
+                        - ItemList API
+                    parameters:
+                        - name: id
+                          description: Id of list to be deleted
+                          in: path
+                          required: true
+                          type: integer
+                    responses:
+                        '200':
+                            description: List have been successfully deleted
+                        '400':
+                            description: Bad request
+                    security:
+                        - ApiAuth: []
+                put:
+                    tags:
+                        - ItemList API
+                    parameters:
+                        - name: id
+                          description: Id of list to be edit
+                          in: path
+                          required: true
+                          type: integer
+                        - name: title
+                          description: New title of list
+                          in: query
+                          required: true
+                          type: string
+                    responses:
+                        '200':
+                            description: List have been successfully edited
+                        '400':
+                            description: Bad request
+                    security:
+                        - ApiAuth: []

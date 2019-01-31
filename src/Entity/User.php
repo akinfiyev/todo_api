@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -59,6 +61,16 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $apiToken;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ItemList", mappedBy="user")
+     */
+    private $itemLists;
+
+    public function __construct()
+    {
+        $this->itemLists = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -165,6 +177,37 @@ class User implements UserInterface
     public function setApiToken(?string $apiToken): self
     {
         $this->apiToken = $apiToken;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ItemList[]
+     */
+    public function getItemLists(): Collection
+    {
+        return $this->itemLists;
+    }
+
+    public function addItemList(ItemList $itemList): self
+    {
+        if (!$this->itemLists->contains($itemList)) {
+            $this->itemLists[] = $itemList;
+            $itemList->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItemList(ItemList $itemList): self
+    {
+        if ($this->itemLists->contains($itemList)) {
+            $this->itemLists->removeElement($itemList);
+            // set the owning side to null (unless already changed)
+            if ($itemList->getUser() === $this) {
+                $itemList->setUser(null);
+            }
+        }
 
         return $this;
     }
