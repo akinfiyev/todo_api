@@ -29,13 +29,4 @@ class ItemListRepository extends ServiceEntityRepository
             ->orderBy('itemList.id', 'ASC')
             ->getQuery();
     }
-
-    public function findOneById(int $id, ?User $user): ?ItemList
-    {
-        return $this->createQueryBuilder('itemList')
-            ->where('itemList.id = ' . $id)
-            ->andWhere('itemList.user = '. $user->getId())
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
 }
