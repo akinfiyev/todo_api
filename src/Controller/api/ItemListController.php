@@ -7,6 +7,7 @@ use App\Entity\ItemList;
 use App\Entity\User;
 use App\Exception\JsonHttpException;
 use App\Normalizer\ItemListNormalizer;
+use App\Normalizer\ItemNormalizer;
 use App\Security\ApiAuthenticator;
 use App\Services\ValidateService;
 use Knp\Component\Pager\PaginatorInterface;
@@ -130,7 +131,7 @@ class ItemListController extends AbstractController
         $itemList->addItem($item);
         $this->getDoctrine()->getManager()->flush();
 
-        return $this->json($item);
+        return $this->json($item, 200, [], [AbstractNormalizer::GROUPS => [ItemNormalizer::GROUP_DETAILS]]);
     }
 
     /**
@@ -142,7 +143,7 @@ class ItemListController extends AbstractController
         if (!($itemList->getUser() === $user) || !($item->getItemList() === $itemList))
             throw new JsonHttpException(400, "Bad request");
 
-        return $this->json($item);
+        return $this->json($item, 200, [], [AbstractNormalizer::GROUPS => [ItemNormalizer::GROUP_DETAILS]]);
     }
 
     /**
@@ -156,6 +157,23 @@ class ItemListController extends AbstractController
 
         $this->getDoctrine()->getManager()->remove($item);
         $this->getDoctrine()->getManager()->flush();
+
+        return $this->json('ok');
+    }
+
+    /**
+     * @Route("/api/lists/{id}/item/{item}", methods={"PUT"}, name="api_lists_item_edit")
+     */
+    public function itemEditAction(Request $request, ItemList $itemList, Item $item)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        if (!($itemList->getUser() === $user) || !($item->getItemList() === $itemList))
+            throw new JsonHttpException(400, "Bad request");
+
+        if ($request->query->has('isChecked')) {
+            $item->setIsChecked($request->query->get('isChecked'));
+            $this->getDoctrine()->getManager()->flush();
+        }
 
         return $this->json('ok');
     }

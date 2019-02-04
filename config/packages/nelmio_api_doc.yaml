@@ -266,3 +266,30 @@ nelmio_api_doc:
                       description: Bad request
                   security:
                     - ApiAuth: []
+                put:
+                  tags:
+                    - Item API
+                  description: Edit item
+                  parameters:
+                    - name: id
+                      description: Id of list where item saved
+                      in: path
+                      required: true
+                      type: integer
+                    - name: item
+                      description: Item id to be edit
+                      in: path
+                      required: true
+                      type: integer
+                    - name: isChecked
+                      description: Boolean if item is checked
+                      in: query
+                      required: false
+                      type: boolean
+                  responses:
+                    '200':
+                      description: Item has been successfully edited
+                    '400':
+                      description: Bad request
+                  security:
+                    - ApiAuth: []

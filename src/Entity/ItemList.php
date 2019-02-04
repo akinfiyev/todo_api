@@ -26,6 +26,9 @@ class ItemList implements \JsonSerializable
      * @Assert\NotNull(
      *     message = "Title should not be blank"
      * )
+     * @Assert\NotBlank(
+     *     message = "Item title should not be blank"
+     * )
      * @Assert\Length(
      *      min = 5,
      *      max = 25,

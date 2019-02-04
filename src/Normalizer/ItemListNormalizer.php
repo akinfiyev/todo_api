@@ -11,7 +11,6 @@ namespace App\Normalizer;
 use App\Entity\ItemList;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class ItemListNormalizer implements NormalizerInterface
 {
@@ -30,7 +29,7 @@ class ItemListNormalizer implements NormalizerInterface
             "title" => $itemList->getTitle()
         ];
 
-        if (isset($context['groups']) && in_array($this::GROUP_DETAILS, $context[AbstractNormalizer::GROUPS])) {
+        if (isset($context[AbstractNormalizer::GROUPS]) && in_array($this::GROUP_DETAILS, $context[AbstractNormalizer::GROUPS])) {
 //            if (!empty($itemList->getItems())) {
 //                $data['items'] = [];
 //                foreach ($itemList->getItems() as $item) {

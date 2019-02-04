@@ -9,6 +9,7 @@ use Gedmo\Mapping\Annotation\SoftDeleteable;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ItemRepository")
  * @SoftDeleteable(fieldName="deletedAt", timeAware=false)
+ * @ORM\EntityListeners({"App\Listener\ItemEntityListener"})
  */
 class Item implements \JsonSerializable
 {
@@ -22,6 +23,9 @@ class Item implements \JsonSerializable
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotNull(
+     *     message = "Item title should not be blank"
+     * )
+     * @Assert\NotBlank(
      *     message = "Item title should not be blank"
      * )
      * @Assert\Length(
@@ -48,6 +52,11 @@ class Item implements \JsonSerializable
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $deletedAt;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isChecked;
 
     public function getId(): ?int
     {
@@ -108,5 +117,17 @@ class Item implements \JsonSerializable
             'id' => $this->getId(),
             'title' => $this->getTitle()
         ];
+    }
+
+    public function getIsChecked(): ?bool
+    {
+        return $this->isChecked;
+    }
+
+    public function setIsChecked(bool $isChecked): self
+    {
+        $this->isChecked = $isChecked;
+
+        return $this;
     }
 }
