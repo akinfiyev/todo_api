@@ -2,15 +2,18 @@
 
 namespace App\Controller\api;
 
+use App\Entity\Item;
 use App\Entity\ItemList;
 use App\Entity\User;
 use App\Exception\JsonHttpException;
+use App\Normalizer\ItemListNormalizer;
 use App\Security\ApiAuthenticator;
 use App\Services\ValidateService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ItemListController extends AbstractController
@@ -41,8 +44,8 @@ class ItemListController extends AbstractController
 
         /* @var ItemList $itemList */
         $itemList = $this->serializer->deserialize($request->getContent(), ItemList::class, 'json');
-        $itemList->setUser($user);
         $this->validateService->validate($itemList);
+        $itemList->setUser($user);
 
         $this->getDoctrine()->getManager()->persist($itemList);
         $this->getDoctrine()->getManager()->flush();
@@ -90,11 +93,70 @@ class ItemListController extends AbstractController
 
         if ($itemList->getUser() === $user && $request->query->has('title')) {
             $itemList->setTitle($request->query->get('title'));
+            $this->validateService->validate($itemList);
             $this->getDoctrine()->getManager()->flush();
 
             return $this->json('ok');
         } else {
             throw new JsonHttpException(400, "Bad request");
         }
+    }
+
+    /**
+     * @Route("/api/lists/{id}", methods={"GET"}, name="api_lists_list_show")
+     */
+    public function listShowAction(Request $request, ItemList $itemList)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        if (!($itemList->getUser() === $user))
+            throw new JsonHttpException(400, "Bad request");
+
+        return $this->json($itemList, 200, [], [AbstractNormalizer::GROUPS => [ItemListNormalizer::GROUP_DETAILS]]);
+    }
+
+    /**
+     * @Route("/api/lists/{id}", methods={"POST"}, name="api_lists_item_add")
+     */
+    public function itemAddAction(Request $request, ItemList $itemList)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        if (!($itemList->getUser() === $user))
+            throw new JsonHttpException(400, "Bad request");
+
+        /* @var Item $item */
+        $item = $this->serializer->deserialize($request->getContent(), Item::class, 'json');
+        $this->validateService->validate($item);
+
+        $itemList->addItem($item);
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->json($item);
+    }
+
+    /**
+     * @Route("/api/lists/{id}/item/{item}", methods={"GET"}, name="api_lists_item_show")
+     */
+    public function itemShowAction(Request $request, ItemList $itemList, Item $item)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        if (!($itemList->getUser() === $user) || !($item->getItemList() === $itemList))
+            throw new JsonHttpException(400, "Bad request");
+
+        return $this->json($item);
+    }
+
+    /**
+     * @Route("/api/lists/{id}/item/{item}", methods={"DELETE"}, name="api_lists_item_delete")
+     */
+    public function itemDeleteAction(Request $request, ItemList $itemList, Item $item)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        if (!($itemList->getUser() === $user) || !($item->getItemList() === $itemList))
+            throw new JsonHttpException(400, "Bad request");
+
+        $this->getDoctrine()->getManager()->remove($item);
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->json('ok');
     }
 }

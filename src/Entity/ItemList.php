@@ -2,14 +2,17 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\SoftDeleteable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ItemListRepository")
  * @SoftDeleteable(fieldName="deletedAt", timeAware=false)
  */
-class ItemList
+class ItemList implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -20,6 +23,15 @@ class ItemList
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotNull(
+     *     message = "Title should not be blank"
+     * )
+     * @Assert\Length(
+     *      min = 5,
+     *      max = 25,
+     *      minMessage = "List title must be at least {{ limit }} characters long",
+     *      maxMessage = "List title cannot be longer than {{ limit }} characters"
+     * )
      */
     private $title;
 
@@ -33,6 +45,16 @@ class ItemList
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $deletedAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Item", mappedBy="itemList", cascade={"persist"})
+     */
+    private $items;
+
+    public function __construct()
+    {
+        $this->items = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -73,5 +95,44 @@ class ItemList
         $this->deletedAt = $deletedAt;
 
         return $this;
+    }
+
+    /**
+     * @return Collection|Item[]
+     */
+    public function getItems(): Collection
+    {
+        return $this->items;
+    }
+
+    public function addItem(Item $item): self
+    {
+        if (!$this->items->contains($item)) {
+            $this->items[] = $item;
+            $item->setItemList($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItem(Item $item): self
+    {
+        if ($this->items->contains($item)) {
+            $this->items->removeElement($item);
+            // set the owning side to null (unless already changed)
+            if ($item->getItemList() === $this) {
+                $item->setItemList(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'title' => $this->getTitle()
+        ];
     }
 }

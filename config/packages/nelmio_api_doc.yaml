@@ -76,6 +76,7 @@ nelmio_api_doc:
                 post:
                     tags:
                         - ItemList API
+                    description: Create new list
                     parameters:
                         - name: ItemList
                           description: ItemList to be created
@@ -110,6 +111,7 @@ nelmio_api_doc:
                 get:
                     tags:
                         - ItemList API
+                    description: List user's lists
                     parameters:
                         - name: startId
                           description: First list to be showed
@@ -141,6 +143,7 @@ nelmio_api_doc:
                 delete:
                     tags:
                         - ItemList API
+                    description: Delete list by id
                     parameters:
                         - name: id
                           description: Id of list to be deleted
@@ -157,6 +160,7 @@ nelmio_api_doc:
                 put:
                     tags:
                         - ItemList API
+                    description: Edit list
                     parameters:
                         - name: id
                           description: Id of list to be edit
@@ -175,3 +179,90 @@ nelmio_api_doc:
                             description: Bad request
                     security:
                         - ApiAuth: []
+                post:
+                    tags:
+                        - Item API
+                    description: Create item and add to list by id
+                    parameters:
+                        - name: id
+                          description: Id of list to add item
+                          in: path
+                          required: true
+                          type: integer
+                        - name: Item
+                          description: Item to be created
+                          in: body
+                          required: true
+                          schema:
+                            type: object
+                            properties:
+                              title:
+                                type: string
+                              expirationDate:
+                                type: string
+                                format: date-time
+                    responses:
+                      '200':
+                        description: Item have been created successfully
+                        schema:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            title:
+                              type: string
+                            expirationDate:
+                              type: string
+                              format: date-time
+                      '400':
+                        description: Bad request
+                    security:
+                        - ApiAuth: []
+                get:
+                  security:
+                    - ApiAuth: []
+            /api/lists/{id}/item/{item}:
+                get:
+                  tags:
+                    - Item API
+                  description: Show item details
+                  parameters:
+                    - name: id
+                      description: Id of list where item saved
+                      in: path
+                      required: true
+                      type: integer
+                    - name: item
+                      description: Item id to be showed
+                      in: path
+                      required: true
+                      type: integer
+                  responses:
+                    '200':
+                      description: Item
+                    '400':
+                      description: Bad request
+                  security:
+                    - ApiAuth: []
+                delete:
+                  tags:
+                    - Item API
+                  description: Delete item
+                  parameters:
+                    - name: id
+                      description: Id of list where item saved
+                      in: path
+                      required: true
+                      type: integer
+                    - name: item
+                      description: Item id to be deleted
+                      in: path
+                      required: true
+                      type: integer
+                  responses:
+                    '200':
+                      description: Item has been successfully deleted
+                    '400':
+                      description: Bad request
+                  security:
+                    - ApiAuth: []
