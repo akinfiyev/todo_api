@@ -45,5 +45,4 @@ class ItemListNormalizer implements NormalizerInterface, SerializerAwareInterfac
     {
         return $itemList instanceof ItemList;
     }
-
 }
