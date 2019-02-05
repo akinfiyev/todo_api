@@ -10,13 +10,13 @@ namespace App\Normalizer;
 
 use App\Entity\ItemList;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
 
-class ItemListNormalizer implements NormalizerInterface, NormalizerAwareInterface
+class ItemListNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
-    use NormalizerAwareTrait;
+    use SerializerAwareTrait;
 
     const GROUP_DETAILS = 'List details';
 
@@ -35,7 +35,7 @@ class ItemListNormalizer implements NormalizerInterface, NormalizerAwareInterfac
 
         if (isset($context[AbstractNormalizer::GROUPS]) && in_array($this::GROUP_DETAILS, $context[AbstractNormalizer::GROUPS])) {
             if (count($itemList->getItems()))
-                $data['items'] = $this->normalizer->normalize($itemList->getItems(), $format, $context);
+                $data['items'] = $this->serializer->normalize($itemList->getItems(), $format, $context);
         }
 
         return $data;
