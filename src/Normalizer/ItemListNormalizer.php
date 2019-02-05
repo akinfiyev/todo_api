@@ -10,11 +10,15 @@ namespace App\Normalizer;
 
 use App\Entity\ItemList;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class ItemListNormalizer implements NormalizerInterface
+class ItemListNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
-    const GROUP_DETAILS = 'Details';
+    use NormalizerAwareTrait;
+
+    const GROUP_DETAILS = 'List details';
 
     /**
      * @param ItemList $itemList
@@ -30,12 +34,8 @@ class ItemListNormalizer implements NormalizerInterface
         ];
 
         if (isset($context[AbstractNormalizer::GROUPS]) && in_array($this::GROUP_DETAILS, $context[AbstractNormalizer::GROUPS])) {
-//            if (!empty($itemList->getItems())) {
-//                $data['items'] = [];
-//                foreach ($itemList->getItems() as $item) {
-//                    $data['items'][] = $item->jsonSerialize();
-//                }
-//            }
+            if (count($itemList->getItems()))
+                $data['items'] = $this->normalizer->normalize($itemList->getItems(), $format, $context);
         }
 
         return $data;
