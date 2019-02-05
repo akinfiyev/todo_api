@@ -54,9 +54,15 @@ class ItemList implements \JsonSerializable
      */
     private $items;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Label", mappedBy="itemLists", cascade={"persist"})
+     */
+    private $labels;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
+        $this->labels = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -137,5 +143,33 @@ class ItemList implements \JsonSerializable
             'id' => $this->getId(),
             'title' => $this->getTitle()
         ];
+    }
+
+    /**
+     * @return Collection|Label[]
+     */
+    public function getLabels(): Collection
+    {
+        return $this->labels;
+    }
+
+    public function addLabel(Label $label): self
+    {
+        if (!$this->labels->contains($label)) {
+            $this->labels[] = $label;
+            $label->addItemList($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLabel(Label $label): self
+    {
+        if ($this->labels->contains($label)) {
+            $this->labels->removeElement($label);
+            $label->removeItemList($this);
+        }
+
+        return $this;
     }
 }
