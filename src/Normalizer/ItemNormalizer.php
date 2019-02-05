@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class ItemNormalizer implements NormalizerInterface
 {
-    const GROUP_DETAILS = 'Details';
+    const GROUP_DETAILS = 'Item details';
 
     /**
      * @param Item $item
