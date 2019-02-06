@@ -172,4 +172,15 @@ class ItemList implements \JsonSerializable
 
         return $this;
     }
+
+    /**
+     * @param $labels
+     * @return ItemList
+     */
+    public function setLabels($labels): self
+    {
+        $this->labels = $labels;
+
+        return $this;
+    }
 }
