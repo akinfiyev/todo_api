@@ -33,6 +33,9 @@ class ItemListNormalizer implements NormalizerInterface, SerializerAwareInterfac
             "title" => $itemList->getTitle()
         ];
 
+        if (count($itemList->getLabels()))
+            $data['labels'] = $this->serializer->normalize($itemList->getLabels(), $format, $context);
+
         if (isset($context[AbstractNormalizer::GROUPS]) && in_array($this::GROUP_DETAILS, $context[AbstractNormalizer::GROUPS])) {
             if (count($itemList->getItems()))
                 $data['items'] = $this->serializer->normalize($itemList->getItems(), $format, $context);
