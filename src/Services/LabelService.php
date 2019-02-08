@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Entity\ItemList;
 use App\Entity\Label;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ObjectManager;
 
 class LabelService
@@ -24,11 +25,11 @@ class LabelService
     }
 
     /**
-     * @param ArrayCollection $labels
+     * @param Collection $labels
      * @param ItemList $itemList
      * @return ArrayCollection
      */
-    public function getSyncLabelsArray(ArrayCollection $labels, ItemList $itemList): ArrayCollection
+    public function getSyncLabelsArray(Collection $labels, ItemList $itemList): ArrayCollection
     {
         $labels =  array_unique($labels->toArray());
 
