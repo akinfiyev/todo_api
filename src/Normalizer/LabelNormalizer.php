@@ -22,6 +22,7 @@ class LabelNormalizer implements NormalizerInterface
     public function normalize($label, $format = null, array $context = [])
     {
         return [
+            "id" => $label->getId(),
             "title" => $label->getTitle()
         ];
     }
