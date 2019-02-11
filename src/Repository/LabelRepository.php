@@ -19,32 +19,13 @@ class LabelRepository extends ServiceEntityRepository
         parent::__construct($registry, Label::class);
     }
 
-    // /**
-    //  * @return Label[] Returns an array of Label objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('l')
-            ->andWhere('l.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('l.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Label
+    public function findOneByTitle(?string $title): ?Label
     {
-        return $this->createQueryBuilder('l')
-            ->andWhere('l.exampleField = :val')
-            ->setParameter('val', $value)
+        return $this->createQueryBuilder('label')
+            ->where('label.title = :title')
+            ->setParameter('title', $title)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
-    */
 }
