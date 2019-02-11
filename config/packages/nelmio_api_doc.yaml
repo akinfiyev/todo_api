@@ -87,13 +87,13 @@ nelmio_api_doc:
                               properties:
                                   title:
                                       type: string
-#                                  labels:
-#                                      type: array
-#                                      items:
-#                                          type: object
-#                                          properties:
-#                                              title:
-#                                                  type: string
+                                  labels:
+                                      type: array
+                                      items:
+                                          type: object
+                                          properties:
+                                              title:
+                                                  type: string
                     responses:
                         '200':
                             description: List have been successfully created
@@ -104,6 +104,15 @@ nelmio_api_doc:
                                         type: integer
                                     title:
                                         type: string
+                                    labels:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          id:
+                                            type: integer
+                                          title:
+                                            type: string
                         '400':
                             description: Bad request
                     security:
@@ -135,6 +144,15 @@ nelmio_api_doc:
                                             type: integer
                                         title:
                                             type: string
+                                        labels:
+                                          type: array
+                                          items:
+                                            type: object
+                                            properties:
+                                              id:
+                                                type: integer
+                                              title:
+                                                type: string
                         '400':
                             description: Bad request
                     security:
@@ -162,16 +180,27 @@ nelmio_api_doc:
                         - ItemList API
                     description: Edit list
                     parameters:
-                        - name: id
-                          description: Id of list to be edit
-                          in: path
-                          required: true
-                          type: integer
-                        - name: title
-                          description: New title of list
-                          in: query
-                          required: true
-                          type: string
+                      - name: id
+                        description: Id of list to be edit
+                        in: path
+                        required: true
+                        type: integer
+                      - name: ItemList
+                        description: ItemList to be created
+                        in: body
+                        required: true
+                        schema:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                            labels:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  title:
+                                    type: string
                     responses:
                         '200':
                             description: List have been successfully edited
@@ -219,6 +248,35 @@ nelmio_api_doc:
                     security:
                         - ApiAuth: []
                 get:
+                  tags:
+                    - ItemList API
+                  parameters:
+                    - name: id
+                      description: Id of list to be showed
+                      in: path
+                      required: true
+                      type: integer
+                  responses:
+                    '200':
+                      description: List have been successfully created
+                      schema:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          title:
+                            type: string
+                          labels:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                title:
+                                  type: string
+                    '400':
+                      description: Bad request
                   security:
                     - ApiAuth: []
             /api/lists/{id}/item/{item}:

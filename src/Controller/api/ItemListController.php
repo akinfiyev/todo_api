@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Exception\JsonHttpException;
 use App\Normalizer\ItemListNormalizer;
 use App\Security\ApiAuthenticator;
+use App\Services\LabelService;
 use App\Services\ValidateService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,14 +37,15 @@ class ItemListController extends AbstractController
     /**
      * @Route("/api/lists", methods={"POST"}, name="api_list_add")
      */
-    public function addAction(Request $request)
+    public function addAction(Request $request, LabelService $labelService)
     {
-        /** @var User $user */
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
 
         /* @var ItemList $itemList */
         $itemList = $this->serializer->deserialize($request->getContent(), ItemList::class, 'json');
         $this->validateService->validate($itemList);
+        $labelService->initLabels($itemList->getLabels(), $itemList);
+        $this->validateService->validate($itemList->getLabels());
         $itemList->setUser($user);
 
         $this->getDoctrine()->getManager()->persist($itemList);
@@ -86,19 +88,27 @@ class ItemListController extends AbstractController
     /**
      * @Route("/api/lists/{id}", methods={"PUT"}, name="api_list_edit")
      */
-    public function editAction(Request $request, ItemList $itemList)
+    public function editAction(Request $request, ItemList $itemList, LabelService $labelService)
     {
         $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
 
-        if ($itemList->getUser() === $user && $request->query->has('title')) {
-            $itemList->setTitle($request->query->get('title'));
-            $this->validateService->validate($itemList);
-            $this->getDoctrine()->getManager()->flush();
+        if ($itemList->getUser() === $user) {
+            /* @var ItemList $newItemList */
+            $newItemList = $this->serializer->deserialize($request->getContent(), ItemList::class, 'json');
+            $newTitle = $newItemList->getTitle();
+            $newLabels = $newItemList->getLabels();
 
-            return $this->json('ok');
+            $itemList->setTitle($newTitle);
+            $this->validateService->validate($itemList);
+            $labelService->syncLabels($newLabels, $itemList);
+            $this->validateService->validate($itemList->getLabels());
+
+            $this->getDoctrine()->getManager()->flush();
         } else {
             throw new JsonHttpException(400, "Bad request");
         }
+
+        return $this->json('ok');
     }
 
     /**
