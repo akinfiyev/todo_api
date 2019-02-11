@@ -174,12 +174,11 @@ class ItemList implements \JsonSerializable
     }
 
     /**
-     * @param $labels
      * @return ItemList
      */
-    public function setLabels($labels): self
+    public function setLabelsEmpty(): self
     {
-        $this->labels = $labels;
+        $this->labels = new ArrayCollection();
 
         return $this;
     }
