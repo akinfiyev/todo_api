@@ -27,24 +27,49 @@ class LabelService
     /**
      * @param Collection $labels
      * @param ItemList $itemList
-     * @return ArrayCollection
      */
-    public function getSyncLabelsArray(Collection $labels, ItemList $itemList): ArrayCollection
+    public function initLabels(Collection $labels, ItemList $itemList): void
     {
-        $labels =  array_unique($labels->toArray());
+        $labels = array_unique($labels->toArray());
+
+        $itemList->setLabelsEmpty();
+
+        /** @var Label $label */
+        foreach ($labels as $label) {
+            $savedLabel = $this->om->getRepository(Label::class)->findOneByTitle($label->getTitle());
+            if (isset($savedLabel))
+                $itemList->addLabel($savedLabel);
+            else
+                $itemList->addLabel($label);
+        }
+    }
+
+    /**
+     * @param Collection $labels
+     * @param ItemList $itemList
+     */
+    public function syncLabels(Collection $labels, ItemList $itemList): void
+    {
+        $labels = array_unique($labels->toArray());
+
+        foreach ($itemList->getLabels() as $itemListLabel) {
+            if (in_array($itemListLabel->getTitle(), $labels)) {
+                if (($key = array_search($itemListLabel->getTitle(), $labels)) !== false)
+                    unset($labels[$key]);
+            } else {
+                $itemList->removeLabel($itemListLabel);
+            }
+        }
 
         /** @var Label $label */
         foreach ($labels as $label) {
             $savedLabel = $this->om->getRepository(Label::class)->findOneByTitle($label->getTitle());
             if (isset($savedLabel)) {
-                if (($key = array_search($label, $labels)) !== false)
-                    unset($labels[$key]);
-
-                $labels[] = $savedLabel;
-                $savedLabel->addItemList($itemList);
+                $itemList->addLabel($savedLabel);
+            } else {
+                $label->setItemListsEmpty();
+                $itemList->addLabel($label);
             }
         }
-
-        return new ArrayCollection($labels);
     }
 }
