@@ -89,10 +89,18 @@ class Label
         return $this;
     }
 
+    /**
+     * @return Label
+     */
+    public function setItemListsEmpty(): self
+    {
+        $this->itemLists = new ArrayCollection();
+
+        return $this;
+    }
+
     public function __toString()
     {
         return $this->getTitle();
     }
-
-
 }
