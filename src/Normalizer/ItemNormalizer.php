@@ -33,6 +33,8 @@ class ItemNormalizer implements NormalizerInterface
         if (isset($context[AbstractNormalizer::GROUPS]) && in_array($this::GROUP_DETAILS, $context[AbstractNormalizer::GROUPS])) {
             if (!empty($item->getExpirationDate()))
                 $data["expirationDate"] = $item->getExpirationDate()->format('H:i d-m-Y');
+            if (!empty($item->getAttachment()))
+                $data["attachment"] = $item->getAttachment();
         }
 
         return $data;
