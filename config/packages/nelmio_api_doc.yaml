@@ -229,11 +229,6 @@ nelmio_api_doc:
                               expirationDate:
                                 type: string
                                 format: date-time
-#                        - name: file
-#                          description: attachment
-#                          in: formData
-#                          required: false
-#                          type: file
                     responses:
                       '200':
                         description: Item have been created successfully
