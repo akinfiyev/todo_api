@@ -2,7 +2,9 @@
 
 namespace App\Controller\api;
 
+use App\Services\UploadService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Item;
 use App\Entity\ItemList;
@@ -14,6 +16,7 @@ use App\Services\ValidateService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ItemController extends AbstractController
 {
@@ -94,5 +97,26 @@ class ItemController extends AbstractController
         }
 
         return $this->json('ok');
+    }
+
+    /**
+     * @Route("/api/lists/{id}/item/{item}/attachment", methods={"POST"}, name="api_item_attachment_add")
+     */
+    public function setAttachmentAction(Request $request, ItemList $itemList, Item $item, UploadService $uploadService)
+    {
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        if (!($itemList->getUser() === $user) || !($item->getItemList() === $itemList))
+            throw new JsonHttpException(400, "Bad request");
+
+        if ($request->files->count()) {
+            $attachment = $uploadService->uploadAttachment($request->files->get("attachment"));
+            $item->setAttachment($attachment);
+        } else {
+            $item->setAttachment(null);
+        }
+
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->json("ok");
     }
 }
