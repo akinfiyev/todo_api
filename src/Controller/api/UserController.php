@@ -4,12 +4,16 @@ namespace App\Controller\api;
 
 use App\Entity\User;
 use App\Exception\JsonHttpException;
+use App\Model\Card;
+use App\Normalizer\UserNormalizer;
+use App\Services\UserService;
 use App\Services\ValidateService;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class UserController extends AbstractController
@@ -41,7 +45,8 @@ class UserController extends AbstractController
         $user->setApiToken(Uuid::uuid4());
         $this->getDoctrine()->getManager()->persist($user);
         $this->getDoctrine()->getManager()->flush();
-        return $this->json($user);
+
+        return $this->json($user, 200, [], [AbstractNormalizer::GROUPS => [UserNormalizer::GROUP_REGISTRATION]]);
     }
 
     /**
@@ -59,6 +64,28 @@ class UserController extends AbstractController
         $user->setApiToken(Uuid::uuid4());
         $this->getDoctrine()->getManager()->flush();
 
-        return ($this->json($user));
+        return ($this->json($user, 200, [], [AbstractNormalizer::GROUPS => [UserNormalizer::GROUP_LOGIN]]));
+    }
+
+    /**
+     * @Route("/api/user", methods={"GET"})
+     */
+    public function getThisUserAction()
+    {
+        return $this->json(['user' => $this->getUser()]);
+    }
+
+    /**
+     * @Route("/api/user/card", methods={"POST"})
+     */
+    public function addCardAction(Request $request, UserService $userService)
+    {
+        /** @var Card $card */
+        $card = $this->serializer->deserialize($request->getContent(), Card::class, 'json');
+        $this->validateService->validate($card);
+
+        $userService->saveCC($card, $this->getUser());
+
+        return $this->json([]);
     }
 }
