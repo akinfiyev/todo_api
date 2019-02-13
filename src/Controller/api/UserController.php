@@ -72,7 +72,7 @@ class UserController extends AbstractController
      */
     public function getThisUserAction()
     {
-        return $this->json(['user' => $this->getUser()]);
+        return $this->json(['user' => $this->getUser()], 200, [], [AbstractNormalizer::GROUPS => [UserNormalizer::GROUP_PROFILE]]);
     }
 
     /**
