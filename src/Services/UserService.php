@@ -24,14 +24,14 @@ class UserService
         $this->doctrine = $doctrine;
     }
 
-    public function saveCC(User $user, Card $card)
+    public function saveCC(Card $card, User $user)
     {
         if (!$user->getStripeCustomerId()) {
-//            $this->stripeService->createStripeCustomer($user);
+            $this->stripeService->createStripeCustomer($user);
             $this->doctrine->getManager()->flush();
         }
 
-//        $this->stripeService->addCardToCustomer($card, $user);
+        $this->stripeService->addCardToCustomer($card, $user);
 
         return $user;
     }
