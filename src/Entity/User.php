@@ -67,6 +67,16 @@ class User implements UserInterface
      */
     private $itemLists;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $stripeCustomerId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $card;
+
     public function __construct()
     {
         $this->itemLists = new ArrayCollection();
@@ -208,6 +218,30 @@ class User implements UserInterface
                 $itemList->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStripeCustomerId(): ?string
+    {
+        return $this->stripeCustomerId;
+    }
+
+    public function setStripeCustomerId(?string $stripeCustomerId): self
+    {
+        $this->stripeCustomerId = $stripeCustomerId;
+
+        return $this;
+    }
+
+    public function getCard(): ?string
+    {
+        return $this->card;
+    }
+
+    public function setCard(?string $card): self
+    {
+        $this->card = $card;
 
         return $this;
     }
