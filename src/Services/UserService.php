@@ -33,6 +33,9 @@ class UserService
 
         $this->stripeService->addCardToCustomer($card, $user);
 
+        $user->setCard("**** **** **** " . substr($card->getNumber(), strlen($card->getNumber())-4));
+        $this->doctrine->getManager()->flush();
+
         return $user;
     }
 }
