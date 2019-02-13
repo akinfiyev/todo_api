@@ -27,13 +27,13 @@ class Card implements \JsonSerializable
      *     max=2,
      *     minMessage="Expiration month value is too short. It should have {{ limit }} characters or less.",
      *     maxMessage="Expiration month value is too long. It should have {{ limit }} characters or less."
-     *     )
+     * )
      * @Assert\Range(
      *     min=1,
      *     max=12,
      *     minMessage="Expiration month value should be {{ limit }} or more.",
      *     maxMessage="Expiration month value should be {{ limit }} or less."
-     *     )
+     * )
      */
     private $expirationMonth;
 
@@ -47,7 +47,7 @@ class Card implements \JsonSerializable
      *     max=4,
      *     minMessage="Expiration year value is too short. It should have {{ limit }} characters or less.",
      *     maxMessage="Expiration year value is too long. It should have {{ limit }} characters or less."
-     *     )
+     * )
      * @Assert\Regex("/[0-9]+/")
      */
     private $expirationYear;
@@ -62,7 +62,7 @@ class Card implements \JsonSerializable
      *     max=4,
      *     minMessage="CVC value is too short. It should have {{ limit }} characters or less.",
      *     maxMessage="CVC value is too long. It should have {{ limit }} characters or less."
-     *     )
+     * )
      * @Assert\Regex("/[0-9]+/")
      */
     private $cvc;

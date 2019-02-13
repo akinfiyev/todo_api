@@ -21,24 +21,41 @@ class Invoice implements \JsonSerializable
     /**
      * @var string
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank()
-     * @Assert\Length(min=3, max=3000)
+     * @Assert\NotBlank(
+     *     message = "Description should not be blank."
+     * )
+     * @Assert\Length(
+     *      min = 3,
+     *      max = 3000,
+     *      minMessage = "Description must be at least {{ limit }} characters long",
+     *      maxMessage = "Description cannot be longer than {{ limit }} characters"
+
+     * )
      */
     private $description;
 
     /**
      * @var integer
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank()
-     * @Assert\Type(type="integer")
+     * @Assert\NotBlank(
+     *     message = "Price should not be blank."
+     * )
+     * @Assert\Type(
+     *     type="integer",
+     *     message = "Price must be integer type."
+     * )
      */
     private $price;
 
     /**
      * @var string
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank()
-     * @Assert\Currency()
+     * @Assert\NotBlank(
+     *     message = "Currency should not be blank."
+     * )
+     * @Assert\Currency(
+     *     message = "Currency must be currency type."
+     * )
      */
     private $currency;
 
