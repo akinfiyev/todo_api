@@ -278,17 +278,12 @@ nelmio_api_doc:
                       description: Bad request
                   security:
                     - ApiAuth: []
-            /api/lists/{id}/item/{item}:
+            /api/item/{item}:
                 get:
                   tags:
                     - Item API
                   description: Show item details
                   parameters:
-                    - name: id
-                      description: Id of list where item saved
-                      in: path
-                      required: true
-                      type: integer
                     - name: item
                       description: Item id to be showed
                       in: path
@@ -306,11 +301,6 @@ nelmio_api_doc:
                     - Item API
                   description: Delete item
                   parameters:
-                    - name: id
-                      description: Id of list where item saved
-                      in: path
-                      required: true
-                      type: integer
                     - name: item
                       description: Item id to be deleted
                       in: path
@@ -328,11 +318,6 @@ nelmio_api_doc:
                     - Item API
                   description: Edit item
                   parameters:
-                    - name: id
-                      description: Id of list where item saved
-                      in: path
-                      required: true
-                      type: integer
                     - name: item
                       description: Item id to be edit
                       in: path
@@ -350,17 +335,12 @@ nelmio_api_doc:
                       description: Bad request
                   security:
                     - ApiAuth: []
-            /api/lists/{id}/item/{item}/attachment:
+            /api/item/{item}/attachment:
               post:
                 tags:
                   - Item API
                 description: Upload/remove attachment
                 parameters:
-                  - name: id
-                    description: Id of list where item saved
-                    in: path
-                    required: true
-                    type: integer
                   - name: item
                     description: Item id where to add attachment
                     in: path

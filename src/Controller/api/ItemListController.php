@@ -3,12 +3,11 @@
 namespace App\Controller\api;
 
 use App\Entity\ItemList;
-use App\Entity\User;
 use App\Exception\JsonHttpException;
 use App\Normalizer\ItemListNormalizer;
-use App\Security\ApiAuthenticator;
 use App\Services\LabelService;
 use App\Services\ValidateService;
+use App\Voter\ItemListVoter;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,14 +38,13 @@ class ItemListController extends AbstractController
      */
     public function addAction(Request $request, LabelService $labelService)
     {
-        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
-
         /* @var ItemList $itemList */
         $itemList = $this->serializer->deserialize($request->getContent(), ItemList::class, 'json');
+        $this->denyAccessUnlessGranted(ItemListVoter::CREATE, $itemList);
         $this->validateService->validate($itemList);
         $labelService->initLabels($itemList->getLabels(), $itemList);
         $this->validateService->validate($itemList->getLabels());
-        $itemList->setUser($user);
+        $itemList->setUser($this->getUser());
 
         $this->getDoctrine()->getManager()->persist($itemList);
         $this->getDoctrine()->getManager()->flush();
@@ -59,13 +57,14 @@ class ItemListController extends AbstractController
      */
     public function listAction(Request $request, PaginatorInterface $paginator)
     {
-        /** @var User $user */
-        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        if (!$this->getUser()) {
+            return new JsonHttpException(404, 'Lists not found');
+        }
 
         $startId = $request->query->has('startId') && $request->query->get('startId') > 0 ? $request->query->get('startId') : 1;
         $listsNumber = $request->query->has('listsNumber') && $request->query->get('listsNumber') > 0 ? $request->query->get('listsNumber') : 5;
 
-        $lists = $this->getDoctrine()->getRepository(ItemList::class)->findAllByUser($user, $startId);
+        $lists = $this->getDoctrine()->getRepository(ItemList::class)->findAllByUser($this->getUser(), $startId);
 
         return $this->json($paginator->paginate($lists, 1, $listsNumber));
     }
@@ -75,9 +74,7 @@ class ItemListController extends AbstractController
      */
     public function deleteAction(Request $request, ItemList $itemList)
     {
-        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
-        if ($itemList->getUser() !== $user)
-            throw new JsonHttpException(400, "Bad request");
+        $this->denyAccessUnlessGranted(ItemListVoter::DELETE, $itemList);
 
         $this->getDoctrine()->getManager()->remove($itemList);
         $this->getDoctrine()->getManager()->flush();
@@ -90,23 +87,19 @@ class ItemListController extends AbstractController
      */
     public function editAction(Request $request, ItemList $itemList, LabelService $labelService)
     {
-        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
+        $this->denyAccessUnlessGranted(ItemListVoter::EDIT, $itemList);
 
-        if ($itemList->getUser() === $user) {
-            /* @var ItemList $newItemList */
-            $newItemList = $this->serializer->deserialize($request->getContent(), ItemList::class, 'json');
-            $newTitle = $newItemList->getTitle();
-            $newLabels = $newItemList->getLabels();
+        /* @var ItemList $newItemList */
+        $newItemList = $this->serializer->deserialize($request->getContent(), ItemList::class, 'json');
+        $newTitle = $newItemList->getTitle();
+        $newLabels = $newItemList->getLabels();
 
-            $itemList->setTitle($newTitle);
-            $this->validateService->validate($itemList);
-            $labelService->syncLabels($newLabels, $itemList);
-            $this->validateService->validate($itemList->getLabels());
+        $itemList->setTitle($newTitle);
+        $this->validateService->validate($itemList);
+        $labelService->syncLabels($newLabels, $itemList);
+        $this->validateService->validate($itemList->getLabels());
 
-            $this->getDoctrine()->getManager()->flush();
-        } else {
-            throw new JsonHttpException(400, "Bad request");
-        }
+        $this->getDoctrine()->getManager()->flush();
 
         return $this->json('ok');
     }
@@ -116,9 +109,7 @@ class ItemListController extends AbstractController
      */
     public function showAction(Request $request, ItemList $itemList)
     {
-        $user = $this->getDoctrine()->getRepository(User::class)->findOneByApiToken($request->headers->get(ApiAuthenticator::X_API_KEY));
-        if (!($itemList->getUser() === $user))
-            throw new JsonHttpException(400, "Bad request");
+        $this->denyAccessUnlessGranted(ItemListVoter::VIEW, $itemList);
 
         return $this->json($itemList, 200, [], [AbstractNormalizer::GROUPS => [ItemListNormalizer::GROUP_DETAILS]]);
     }
