@@ -4,9 +4,7 @@ namespace App\Controller\api;
 
 use App\Entity\User;
 use App\Exception\JsonHttpException;
-use App\Model\Card;
 use App\Normalizer\UserNormalizer;
-use App\Services\UserService;
 use App\Services\ValidateService;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -73,19 +71,5 @@ class UserController extends AbstractController
     public function getThisUserAction()
     {
         return $this->json(['user' => $this->getUser()], 200, [], [AbstractNormalizer::GROUPS => [UserNormalizer::GROUP_PROFILE]]);
-    }
-
-    /**
-     * @Route("/api/user/card", methods={"POST"})
-     */
-    public function addCardAction(Request $request, UserService $userService)
-    {
-        /** @var Card $card */
-        $card = $this->serializer->deserialize($request->getContent(), Card::class, 'json');
-        $this->validateService->validate($card);
-
-        $userService->saveCC($card, $this->getUser());
-
-        return $this->json([]);
     }
 }

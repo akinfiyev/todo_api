@@ -30,7 +30,7 @@ class LabelService
      */
     public function initLabels(Collection $labels, ItemList $itemList): void
     {
-        $labels = array_unique($labels->toArray());
+        $labels = array_unique($labels->getValues());
 
         $itemList->setLabelsEmpty();
 

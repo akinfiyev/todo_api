@@ -37,10 +37,6 @@ class UserNormalizer implements NormalizerInterface
         if (isset($context[AbstractNormalizer::GROUPS]) && in_array($this::GROUP_REGISTRATION, $context[AbstractNormalizer::GROUPS]))
             $data["apiToken"] = $user->getApiToken();
 
-        if (isset($context[AbstractNormalizer::GROUPS]) && in_array($this::GROUP_PROFILE, $context[AbstractNormalizer::GROUPS]))
-            if ($user->getCard())
-                $data["card"] = $user->getCard();
-
         return $data;
     }
 
